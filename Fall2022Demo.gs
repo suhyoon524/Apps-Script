@@ -1,9 +1,22 @@
 function myFunction() {
-  var form = FormApp.create('Fall 2022 Demo')
+    //var form = FormApp.create('Fall 2022 Demo')
+  var form = FormApp.openById('1lLbtlw7AW3qd1ruTA9pJGwb3QgHkqFTV8jFcjRR7K3o')
+                    .setDescription('Please indicate your scheduling preferences for the term listed above.  Your preferences will influence your schedule, but they are not the only (nor the highest priority) factor.  The schedule is largely created by a integer linear program, which will take your input literally.  If you leave 8:00 and 4:00 without X\'s, you will likely be teaching at both those times.Here is a fairly comprehensive list of the priorities of the ILP, in roughly the order of preference:\n\n1. Follow the UWSP standard block structure.\n2. Follow the STEM scheduling agreement for courses taken by other majors.\n3. No classes scheduled during department meeting times.\n4. No instructor scheduled for back-to-back-to-back classes. (Three in a row)\n5. No instructor scheduled for back-to-back in different buildings.\n6. Avoid conflicts among upper-level courses that may normally be taken in the same semester.\n7. Sections of the same course not offered at the same time (except, occasionally, when we want to do this).\n8. Your personal preferences.\n9. Courses that fill (109, 111, 112, 119, 225, 226, 209, 230, 255, 356) offered in larger rooms.  The list this applied to is in continual flux.');
   
+  var image = UrlFetchApp.fetch('https://dcstatic.library.wisc.edu/Collections/images/UWSPAbout_logoNew.jpg');
+  form.addImageItem()
+      .setTitle('UWSP')
+      .setHelpText('UWSP Logo')
+      .setImage(image);
+      
   var name = form.addTextItem();
   name.setTitle('Name')
       .setRequired(true);
+  
+  var nameValidation = FormApp.createTextValidation()
+      .setHelpText("Please enter your name.")
+      .build();
+  name.setValidation(nameValidation);
 
   var note = form.addParagraphTextItem();
   note.setTitle('Special Notes')
@@ -52,8 +65,7 @@ function myFunction() {
 
   var timetableValidation = FormApp.createCheckboxGridValidation()
       .setHelpText("You may only select three or fewer hours per day.")
-      .requireSelectAtMostPerColumn(3)
-      //.requireLimitOneResponsePerColumn()
+      .requireLimitOneResponsePerColumn()
       .build();
 timetable.setValidation(timetableValidation);
 
