@@ -1,0 +1,34 @@
+function sendErrorEmail() {
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet()
+  var sheet=ss.getSheetByName('Combined');
+  var n=sheet.getLastRow();
+ 
+  for (var i = 3; i <n+1 ; i++){
+
+    //Fetch All Points Error
+    var errorPoint = sheet.getRange(i, 27).getValue();   
+    
+   //Check error
+    if (typeof errorPoint === 'string') {
+      
+      var lastName = sheet.getRange(i, 4).getValue(); //Fetch the Last Name     
+      var emailAddress = sheet.getRange(i, 2).getValue(); //Fetch the email address
+      var point = sheet.getRange(i, 18).getValue();
+      var subject = 'Survey Error'; //Send Alert Email
+      
+        //10 point email
+        if ( point == '10'){
+          var url = sheet.getRange(2, 2).getValue();
+          var message = 'Dear. ' + lastName + ',\nYou used more points than 10 points on UWSP Instructor Scheduling Preference - Fall 2022 Survey. Please double check your answers and resubmit the form by May 21, 2022. If the error isn’t fixed by then, I will change your input to meet the rules, likely without consulting you.\n\nSurvey URL: '+url;   
+          MailApp.sendEmail(emailAddress, subject, message);   
+        }
+          //14 point email
+        else if ( point == '14'){
+          var url = sheet.getRange(2, 4).getValue();
+          var message = 'Dear. ' + lastName + ',\nYou used more points than 14 points on UWSP Instructor Scheduling Preference - Fall 2022 Survey. Please double check your answers and resubmit the form by May 21, 2022. If the error isn’t fixed by then, I will change your input to meet the rules, likely without consulting you.\n\nSurvey URL: '+url; 
+          MailApp.sendEmail(emailAddress, subject, message);   
+        }
+      }            
+    }
+}
