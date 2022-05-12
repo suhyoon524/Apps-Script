@@ -1,0 +1,10 @@
+function autofillFormulasFunction() {
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sourceSheet = ss.getSheetByName('Combined');
+
+  var lastRow = sourceSheet.getLastRow();
+  var filldownRange = sourceSheet.getRange(2, 18, lastRow-1, 9); // starting row, col, numRow, numCol
+ 
+  sourceSheet.getRange("R2:AA2").copyTo(filldownRange);
+}
