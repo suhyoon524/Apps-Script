@@ -1,0 +1,206 @@
+function tenPointsForm() {
+  var form = FormApp.create('Instructor Scheduling Preferences \n(10 points) - Spring 2023 ')
+                    .setDescription('Please indicate your scheduling preferences for the term listed above.  Your preferences will influence your schedule, but they are not the only (nor the highest priority) factor.  The schedule is largely created by a integer linear program, which will take your input literally.  If you leave 8:00 and 4:00 without X\'s, you will likely be teaching at both those times.Here is a fairly comprehensive list of the priorities of the ILP, in roughly the order of preference:\n\n1. Follow the UWSP standard block structure.\n2. Follow the STEM scheduling agreement for courses taken by other majors.\n3. No classes scheduled during department meeting times.\n4. No instructor scheduled for back-to-back-to-back classes. (Three in a row)\n5. No instructor scheduled for back-to-back in different buildings.\n6. Avoid conflicts among upper-level courses that may normally be taken in the same semester.\n7. Sections of the same course not offered at the same time (except, occasionally, when we want to do this).\n8. Your personal preferences.\n9. Courses that fill (109, 111, 112, 119, 225, 226, 209, 230, 255, 356) offered in larger rooms.  The list this applied to is in continual flux.');
+
+// Section 1
+  var email =form.addTextItem();
+  email.setTitle('Email')
+        .setRequired(true)
+        .setHelpText('When your response is invalid, email requesting you to edit the response wil be sent.');
+
+  var fname = form.addTextItem();
+  fname.setTitle('First Name')
+      .setRequired(true);
+
+  var lname = form.addTextItem();
+  lname.setTitle('Last Name')
+      .setRequired(true);
+  
+  var note = form.addParagraphTextItem();
+  note.setTitle('Special Notes')
+      .setHelpText('For example, "I only teach in the evenings."');
+
+  var meeting = form.addParagraphTextItem();
+  meeting.setTitle('Expected University-level committee meetings.')
+          .setHelpText('Please provide name of meeting and day/time of meeting');
+
+  var fourcrcourse = form.addMultipleChoiceItem();
+  fourcrcourse.setTitle('Four-credit courses: do you like or dislike meeting four days in a row?')
+              .setRequired(true)
+              .setChoices([
+                fourcrcourse.createChoice('Like four days in a row'),
+                fourcrcourse.createChoice('Dislike four days in a row'),
+                fourcrcourse.createChoice('Do not care')
+                ]);
+  
+  var twosecourse = form.addMultipleChoiceItem();
+  twosecourse.setTitle('Two sections of same course: how strongly do you want them on the same days of the week?')
+              .setRequired(true)
+              .setChoices([
+                twosecourse.createChoice('Strongly want same days of week'),
+                twosecourse.createChoice('Do not care')
+              ]);
+
+// Section 2
+  var penaltyPageBreak = form.addPageBreakItem();
+  penaltyPageBreak.setTitle('Spending Your Points - 10 points')
+                .setHelpText('You have 10 points to use how you wish. I tried to make the directions clear, but this form is not automatically checked. You have an advanced degree. Check your work. If you use more points than you have, or if you violate other rules, then I will change your input to meet the rules, likely without consulting you.');
+
+  var penaltybacktoback = form.addListItem();
+  penaltybacktoback.setTitle('Penalty for back-to-back classes. The higher number of points you use, the more likely you will be to NOT have back-to-back blocks.')
+                    .setHelpText("Select 0 if you do not care if you have back-to-backs. Select 10 if you really do not want them.")
+                    .setRequired(true)                  
+                    .setChoices([
+                      penaltybacktoback.createChoice('0'),
+                      penaltybacktoback.createChoice('1', finalPageBreak),
+                      penaltybacktoback.createChoice('2',finalPageBreak),
+                      penaltybacktoback.createChoice('3',finalPageBreak),
+                      penaltybacktoback.createChoice('4',finalPageBreak),
+                      penaltybacktoback.createChoice('5',finalPageBreak),
+                      penaltybacktoback.createChoice('6',finalPageBreak),
+                      penaltybacktoback.createChoice('7',finalPageBreak),
+                      penaltybacktoback.createChoice('8',finalPageBreak),
+                      penaltybacktoback.createChoice('9',finalPageBreak),
+                      penaltybacktoback.createChoice('10',finalPageBreak)
+                    ]);
+
+// Section 3 
+  var rewardPageBreak = form.addPageBreakItem();
+
+  var rewardbacktoback = form.addListItem();
+  rewardbacktoback.setTitle('Reward for back-to-back classes. Larger means you really want back-to-backs. Note that it does not make sense to put positive points in both this and the previous question.')
+                   .setHelpText("Select 10 if you really want them. Select 10 if you really want back-to-backs.\n*This question will be disabled if you put positive points in the previous question.")
+                   .setRequired(true)  
+                   .setChoices([
+                      rewardbacktoback.createChoice('0'),
+                      rewardbacktoback.createChoice('1'),
+                      rewardbacktoback.createChoice('2'),
+                      rewardbacktoback.createChoice('3'),
+                      rewardbacktoback.createChoice('4'),
+                      rewardbacktoback.createChoice('5'),
+                      rewardbacktoback.createChoice('6'),
+                      rewardbacktoback.createChoice('7'),
+                      rewardbacktoback.createChoice('8'),
+                      rewardbacktoback.createChoice('9'),
+                      rewardbacktoback.createChoice('10')
+                    ]);
+
+// Section 4
+  var finalPageBreak = form.addPageBreakItem();
+
+  var requestopenday = form.addCheckboxItem();
+  requestopenday.setTitle('I prefer to have an open day. Note that this will not work if you are teaching a 5-credit course.')
+                .setChoices([
+                  requestopenday.createChoice('Request open day (2pts).')
+                ]);
+
+  var acceptabledays = form.addCheckboxItem();
+  acceptabledays.setTitle('If you requested an open day, what are the acceptable days? (More options means more likely possible.)')
+                .setChoices([
+                  acceptabledays.createChoice('Monday'),
+                  acceptabledays.createChoice('Tuesday'),
+                  acceptabledays.createChoice('Wednesday'),
+                  acceptabledays.createChoice('Thursday'),
+                  acceptabledays.createChoice('Friday')
+                ]);
+ 
+ // Section 4 - Timetable
+  var timetableHeader = form.addSectionHeaderItem();
+  timetableHeader.setTitle('I prefer not to teach during the following times. Each box checked costs 1 point and indicates an undesirable time for you. You may only place X\'s in three or fewer hours per day.');
+  
+  var monday = form.addCheckboxItem();
+  monday.setTitle('Monday')
+                .setChoices([
+                  monday.createChoice('8'),
+                  monday.createChoice('9'),
+                  monday.createChoice('10'),
+                  monday.createChoice('11'),
+                  monday.createChoice('12'),
+                  monday.createChoice('13'),
+                  monday.createChoice('14'),
+                  monday.createChoice('15'),
+                  monday.createChoice('16')
+                ]);
+
+  var tuesday = form.addCheckboxItem();
+  tuesday.setTitle('Tuesday')
+                .setChoices([
+                  tuesday.createChoice('8'),
+                  tuesday.createChoice('9'),
+                  tuesday.createChoice('10'),
+                  tuesday.createChoice('11'),
+                  tuesday.createChoice('12'),
+                  tuesday.createChoice('13'),
+                  tuesday.createChoice('14'),
+                  tuesday.createChoice('15'),
+                  tuesday.createChoice('16')
+                ]);             
+                
+  var wednesday = form.addCheckboxItem();
+  wednesday.setTitle('Wednesday')
+                .setChoices([
+                  wednesday.createChoice('8'),
+                  wednesday.createChoice('9'),
+                  wednesday.createChoice('10'),
+                  wednesday.createChoice('11'),
+                  wednesday.createChoice('12'),
+                  wednesday.createChoice('13'),
+                  wednesday.createChoice('14'),
+                  wednesday.createChoice('15'),
+                  wednesday.createChoice('16')
+                ]);
+
+  var thursday = form.addCheckboxItem();
+  thursday.setTitle('Thursday')
+                .setChoices([
+                  thursday.createChoice('8'),
+                  thursday.createChoice('9'),
+                  thursday.createChoice('10'),
+                  thursday.createChoice('11'),
+                  thursday.createChoice('12'),
+                  thursday.createChoice('13'),
+                  thursday.createChoice('14'),
+                  thursday.createChoice('15'),
+                  thursday.createChoice('16')
+                ]);
+
+  var friday = form.addCheckboxItem();
+  friday.setTitle('Friday')
+                .setChoices([
+                  friday.createChoice('8'),
+                  friday.createChoice('9'),
+                  friday.createChoice('10'),
+                  friday.createChoice('11'),
+                  friday.createChoice('12'),
+                  friday.createChoice('13'),
+                  friday.createChoice('14'),
+                  friday.createChoice('15'),
+                  friday.createChoice('16')
+                ]);   
+
+// Validation
+  var nameValidation = FormApp.createTextValidation()
+      .setHelpText("Please enter your name.")
+      .build();
+  fname.setValidation(nameValidation)
+  lname.setValidation(nameValidation);
+
+  var emailValidation = FormApp.createTextValidation()
+    .setHelpText('Please enter valid email address.')
+    .requireTextIsEmail()
+    .build();
+  email.setValidation(emailValidation);
+
+  var timetableValidation = FormApp.createCheckboxValidation()
+    .setHelpText("You may select up to three per day.")
+    .requireSelectAtMost(3)
+    .build();
+  monday.setValidation(timetableValidation),
+  tuesday.setValidation(timetableValidation),
+  wednesday.setValidation(timetableValidation),  
+  thursday.setValidation(timetableValidation),
+  friday.setValidation(timetableValidation);     
+
+  Logger.log('Published URL: ' + form.getPublishedUrl());
+  Logger.log('Editor URL: ' + form.getEditUrl());
+}
