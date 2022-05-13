@@ -1,0 +1,61 @@
+function oldsendErrorEmail() {
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet()
+  var sheet1=ss.getSheetByName('10ptsRes');
+  var sheet2=ss.getSheetByName('14ptsRes');
+  
+  var n=sheet1.getLastRow();
+  var m=sheet2.getLastRow();
+
+  //10pts
+  for (var i = 2; i <n+1 ; i++){
+    //Fetch Last Name
+    var lastNameRange = sheet1.getRange(i, 4);
+    var lastName = lastNameRange.getValue();
+
+    //Fetch All Points Error
+    var errorPointRange = sheet1.getRange(i, 26);
+    var errorPoint = errorPointRange.getValue();
+    
+   //Check error string
+    if (typeof errorPoint === 'string') {
+      //Fetch the email address
+      var emailRange = sheet1.getRange(i,2);
+      var emailAddress = emailRange.getValue();
+
+      //send Alert Email
+      var subject = '10pts Testing Error';
+      
+      //Note the URL is for 10pts
+      var message = 'Dear. ' + lastName + '. \nYou used more points than 10 points on UWSP Instructor Scheduling Preference - Fall 2022 Survey. Please double check your answers and resubmit the form by May 21, 2022. If the error isn’t fixed by then, I will change your input to meet the rules, likely without consulting you.\n\nSurvey URL: https://docs.google.com/forms/d/e/1FAIpQLScg0Jv51C9ReJmyBDnR8meWCJ4Q2ztTg8F0wVfCZl-t5EpfRA/viewform'      
+
+      MailApp.sendEmail(emailAddress, subject, message);
+      }            
+    }
+
+    //14pts    
+    for (var i = 2; i <m+1 ; i++){
+    //Fetch Last Name
+    var lastNameRange = sheet2.getRange(i, 4);
+    var lastName = lastNameRange.getValue();
+
+    //Fetch All Points Error
+    var errorPointRange = sheet2.getRange(i, 26);
+    var errorPoint = errorPointRange.getValue();
+    
+   //Check error string
+    if (typeof errorPoint === 'string') {
+      //Fetch the email address
+      var emailRange = sheet2.getRange(i,2);
+      var emailAddress = emailRange.getValue();
+
+      //send Alert Email
+      var subject = '14pts Testing Error';
+      
+      //Note the URL is for 14pts
+      var message = 'Dear. ' + lastName + '. \nYou used more than 14 points on UWSP Instructor Scheduling Preference - Fall 2022 Survey. Please double check your answers and resubmit the form by May 21, 2022. If the error isn’t fixed by then, I will change your input to meet the rules, likely without consulting you.\n\nSurvey URL: https://docs.google.com/forms/d/e/1FAIpQLSe28021ssEg-WTDZAwDqRPMgpgv3OZY2Xko6HF7wQz4vn7nfQ/viewform'
+
+      MailApp.sendEmail(emailAddress, subject, message);
+      } 
+    } 
+  }
